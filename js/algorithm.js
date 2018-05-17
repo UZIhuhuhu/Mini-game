@@ -1,3 +1,9 @@
+/*
+ * @Author: wynnxin 
+ * @Date: 2018-05-17 18:57:31 
+ * @Last Modified by:   wynnxin 
+ * @Last Modified time: 2018-05-17 18:57:31 
+ */
 const damagedOrSunk = (board = [], attacks = []) => {
   // ships.push(board.length);
   let ships = { 1: 0, 2: 0, 3: 0 },

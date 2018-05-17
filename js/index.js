@@ -1,3 +1,9 @@
+/*
+ * @Author: wynnxin 
+ * @Date: 2018-05-17 18:57:06 
+ * @Last Modified by: wynnxin
+ * @Last Modified time: 2018-05-17 19:59:17
+ */
 window.onload = () => {
   //存输入的challenge Number
   let challenge = new Array();
@@ -36,7 +42,6 @@ window.onload = () => {
   };
   skip();
 
-
   //生成表格
   const render = () => {
     const table = document.querySelector(`.table`);
@@ -51,7 +56,6 @@ window.onload = () => {
     });
   };
   render();
-
 
   //得分
   var point = 0;
@@ -155,7 +159,10 @@ window.onload = () => {
   //点击不是小船的次数
   var clickOther = 0;
 
-  //每个方格点击都会记录次数
+  //1全打中 2 打中一个 3 一个没打中
+  var boatFlag = 0;
+
+  //计算Point的逻辑
   tbody.forEach(x =>
     x.addEventListener(`click`, e => {
       clickNum++;
@@ -166,7 +173,7 @@ window.onload = () => {
       //记下点击元素的id
       var boatIdArr = new Array();
       for (let i in boatAll) {
-        if (i != undefined) {
+        if (boatAll[i] != undefined) {
           boatIdArr.push(boatAll[i].id);
         }
       }
@@ -177,41 +184,60 @@ window.onload = () => {
       //判断点击的元素是否是小船数组里的元素
       if (boatAll.includes(e.currentTarget)) {
         if (randomLength == 1) {
-          clickBoatNum++;
+          //长度是1的打中
+          clickBoatNum = 1;
         } else {
+          //没有全打中
           if (crr.length < randomLength) {
-            clickBoatNum = 1;
+            console.log(`打中一下下`);
+            clickBoatNum = 4;
           } else {
-            clickBoatNum = randomLength;
+            //全部打中
+            clickBoatNum = 5;
           }
         }
       } else {
-        clickOther++;
+        //一次没打中
+        if (crr.length == 0) {
+          clickOther++;
+          clickBoatNum = -1;
+        }
       }
-
+      
+      
       /**
        * 打中的次数和小船的长度进行比较
        * 全部打中 Point+1
        *  小船长度>1&&打中次数小于长度 Point+0.5
        * 点击其他空格的次数 = 船的长度 Point-1
        */
-      if (clickBoatNum == randomLength) {
-        countPlus(1);
-      } else if (
-        clickNum == randomLength &&
-        clickBoatNum < randomLength &&
-        randomLength > 1 &&
-        clickBoatNum > 0
-      ) {
-        countPlus(0.5);
-      } else if (clickOther == randomLength) {
-        countPlus(-1);
+
+      if (clickNum == randomLength) {
+        if (clickBoatNum >= 0) {
+          if (randomLength == 1) {
+            countPlus(1);
+          } else {
+            if (clickBoatNum == 4) {
+              countPlus(0.5);
+            } else if (clickBoatNum == 5) {
+              countPlus(1);
+            }
+          }
+        } else {
+          if (randomLength == 1) {
+            countPlus(-1);
+          } else {
+            if (clickNum == randomLength) {
+              countPlus(-1);
+            }
+          }
+        }
       }
 
       //点击次数超过小船长度 => 生成新的随机小船
       if (clickNum >= randomLength) {
         boatAll.forEach(y => {
-          y.setAttribute(`choose`, false);
+          // y.setAttribute(`choose`, false);
           domDisapper(y);
         });
         //小船的长度和小船的全部空格更新
@@ -229,9 +255,6 @@ window.onload = () => {
     })
   );
 
-
-
-  
   //随机小船生成
   var randomBoat = function() {
     //随机点
