@@ -1,4 +1,8 @@
 window.onload = () => {
+  //存输入的challenge Number
+  let challenge = new Array();
+
+  //输入框页面 => 小游戏页面
   const skip = () => {
     const father = document.querySelector(`.mini-game`);
     const confirmBtn = document.querySelector(`.confirm-btn`);
@@ -8,13 +12,11 @@ window.onload = () => {
       if (numInput.value != "") {
         if (!isNaN(Number(numInput.value))) {
           father.classList.add(`fadeOutLeft`);
-          localStorage.setItem("challengeNumber", Number(numInput.value));
           setTimeout(() => {
             document.body.removeChild(father);
             const gameContainer = document.querySelector(`.container`);
             gameContainer.style.display = `block`;
             gameContainer.classList.add(`zoomInDown`);
-            // render();
           }, 500);
         } else {
           father.classList.add(`shake`);
@@ -34,30 +36,22 @@ window.onload = () => {
   };
   skip();
 
+
   //生成表格
   const render = () => {
     const table = document.querySelector(`.table`);
     for (let i = 0; i < 8; i++) {
-      table.innerHTML += `<tr>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-      <th class="animated" choose="false"></th>
-  </tr>`;
+      table.innerHTML += `<tr></tr>`;
+      var tr = document.querySelector(`tr`);
     }
+    Array.from(document.querySelectorAll(`tr`)).map(x => {
+      for (let j = 0; j < 15; j++) {
+        x.innerHTML += `<th class="animated" choose="false"></th>`;
+      }
+    });
   };
   render();
+
 
   //得分
   var point = 0;
@@ -168,46 +162,32 @@ window.onload = () => {
       e.currentTarget.id = Math.random();
       //点击后设置选中
       e.currentTarget.setAttribute(`choose`, true);
-      // console.log(e.currentTarget);
-      // console.log(boatAll);
 
-      // console.log(e.currentTarget.getAttribute(`choose`))
-      //FIXME:
-      //全部打中 +1   打中一部分 +0.5   没打中 -1
-      //判断点击的空格是否是当前小船的一部分
-      // console.log(boatAll);
-      // console.log(boatAll.filter(z => z.getAttribute(`choose`) == `false`));
-      var newBoatArr = boatAll.filter(z => z.getAttribute(`choose`) == `false`);
-      for (let i in newBoatArr) {
-        // if (newBoatArr[i] == e.currentTarget) {
-        //   clickBoatNum++;
-        // } else {
-        //   clickBoatNum--;
-        // }
-        // console.log(newBoatArr[i]);
+      //记下点击元素的id
+      var boatIdArr = new Array();
+      for (let i in boatAll) {
+        if (i != undefined) {
+          boatIdArr.push(boatAll[i].id);
+        }
       }
-      // console.log(e.currentTarget);
-      // console.log(newBoatArr.length);
-      // console.log(boatAll);
-      // console.log(e.currentTarget);
+
+      //过滤空值的元素 => 因为点击后才有id 所以根据crr数组的长度和小船的长度比较,就可以判断是否全部被打中
+      var crr = boatIdArr.filter(i => i != "");
+
+      //判断点击的元素是否是小船数组里的元素
       if (boatAll.includes(e.currentTarget)) {
-        console.log(`includes`);
-        clickBoatNum++;
+        if (randomLength == 1) {
+          clickBoatNum++;
+        } else {
+          if (crr.length < randomLength) {
+            clickBoatNum = 1;
+          } else {
+            clickBoatNum = randomLength;
+          }
+        }
       } else {
-        console.log(`dont includes`);
         clickOther++;
       }
-      // boatAll.forEach(element => {
-      //   if(element == e.currentTarget){
-      //     //打中小船的次数增加
-      //     clickBoatNum++;
-      //   }else{
-
-      //   }
-      // });
-
-      //FIXME:
-      //和上次击中的不能相同 记录上次点击的方格 lastClick = e.currentTarget
 
       /**
        * 打中的次数和小船的长度进行比较
@@ -245,14 +225,13 @@ window.onload = () => {
         clickBoatNum = 0;
         //点击其他空格的次数重置
         clickOther = 0;
-
-        //记录上一次的打击
-        var lastHit = e.currentTarget;
-        console.log(lastHit);
       }
     })
   );
 
+
+
+  
   //随机小船生成
   var randomBoat = function() {
     //随机点
@@ -360,8 +339,6 @@ window.onload = () => {
       boatAll = domAppear(tbody[randomDot]);
     }
     // }, 1000);
-
-    // return randomLength;
     return {
       randomLength: randomLength,
       boatAll: boatAll
