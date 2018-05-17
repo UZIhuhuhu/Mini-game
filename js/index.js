@@ -2,7 +2,7 @@
  * @Author: wynnxin 
  * @Date: 2018-05-17 18:57:06 
  * @Last Modified by: wynnxin
- * @Last Modified time: 2018-05-17 20:07:42
+ * @Last Modified time: 2018-05-17 23:40:59
  */
 window.onload = () => {
   //存输入的challenge Number
@@ -67,17 +67,9 @@ window.onload = () => {
   var pointDom = document.querySelector(`.point`);
   var tbody = Array.from(document.querySelectorAll(`tbody tr th`));
 
-  //挑战的分数
-  if (localStorage.getItem(`challengeNumber`) != null) {
-    var challengeNumber = localStorage.getItem(`challengeNumber`);
-    //清除存储
-    localStorage.removeItem(`boardNumber`);
-  } else {
-    var challengeNumber = 0;
-  }
 
   //随机小船出现的动画
-  const domAppear = (...arguments) => {
+  const domAppear = (...arg) => {
     //随机色
     var randomColor = [
       "#7986cb",
@@ -88,7 +80,7 @@ window.onload = () => {
       "#9575cd"
     ];
     var randomColorIndex = Math.ceil(Math.random() * 6) - 1;
-    [...arguments].forEach(element => {
+    [...arg].forEach(element => {
       if (element != undefined) {
         element.style.backgroundColor = randomColor[randomColorIndex];
         element.classList.add(`jackInTheBox`);
@@ -97,12 +89,12 @@ window.onload = () => {
         }, 2000);
       }
     });
-    return [...arguments];
+    return [...arg];
   };
 
   //完成挑战的动画
-  const winAnimation = (...arguments) => {
-    [...arguments].forEach(element => {
+  const winAnimation = (...arg) => {
+    [...arg].forEach(element => {
       if (element != undefined) {
         element.style.backgroundColor = `#f44336`;
         element.classList.add(`jackInTheBox`);
@@ -112,15 +104,15 @@ window.onload = () => {
         setTimeout(() => {
           element.style.backgroundColor = `#fff`;
           element.classList.add(`rollOut`);
-        }, 600);
+        }, 900);
       }
     });
   };
 
   //小船消失的动画
-  const domDisapper = (...arguments) => {
+  const domDisapper = (...arg) => {
     return new Promise(resolve => {
-      [...arguments].forEach(element => {
+      [...arg].forEach(element => {
         if (element != undefined) {
           element.classList.add(`rollOut`);
           element.style.backgroundColor = `#fff`;
@@ -141,8 +133,10 @@ window.onload = () => {
     setTimeout(() => {
       pointDom.classList.remove(`rubberBand`);
     }, 600);
+
+    //达到挑战分数的动画
     if (challenge[0] != undefined) {
-      if (point == challenge[0]) {
+      if (point >= challenge[0]) {
         setInterval(() => {
           let winRandom = Math.ceil(Math.random() * 120) - 1;
           let winDirection = Math.ceil(Math.random() * 3);
@@ -163,7 +157,11 @@ window.onload = () => {
           }
           point--;
           pointDom.innerHTML = `Points:${Number(point)}`;
-        }, 400);
+          pointDom.classList.add(`rubberBand`);
+          setTimeout(() => {
+            pointDom.classList.remove(`rubberBand`);
+          }, 900);
+        }, 1500);
       }
     }
   };
@@ -175,8 +173,6 @@ window.onload = () => {
   //点击不是小船的次数
   var clickOther = 0;
 
-  //1全打中 2 打中一个 3 一个没打中
-  var boatFlag = 0;
 
   //计算Point的逻辑
   tbody.forEach(x =>
@@ -196,7 +192,7 @@ window.onload = () => {
 
       //过滤空值的元素 => 因为点击后才有id 所以根据crr数组的长度和小船的长度比较,就可以判断是否全部被打中
       var crr = boatIdArr.filter(i => i != "");
-
+      // console.log(crr);
       //判断点击的元素是否是小船数组里的元素
       if (boatAll.includes(e.currentTarget)) {
         if (randomLength == 1) {
@@ -205,7 +201,7 @@ window.onload = () => {
         } else {
           //没有全打中
           if (crr.length < randomLength) {
-            console.log(`打中一下下`);
+            // console.log(`打中一下下`);
             clickBoatNum = 4;
           } else {
             //全部打中
@@ -214,6 +210,7 @@ window.onload = () => {
         }
       } else {
         //一次没打中
+        console.log(`没打中`);
         if (crr.length == 0) {
           clickOther++;
           clickBoatNum = -1;
