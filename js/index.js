@@ -2,7 +2,7 @@
  * @Author: wynnxin 
  * @Date: 2018-05-17 18:57:06 
  * @Last Modified by: wynnxin
- * @Last Modified time: 2018-05-17 19:59:17
+ * @Last Modified time: 2018-05-17 20:07:42
  */
 window.onload = () => {
   //存输入的challenge Number
@@ -18,6 +18,11 @@ window.onload = () => {
       if (numInput.value != "") {
         if (!isNaN(Number(numInput.value))) {
           father.classList.add(`fadeOutLeft`);
+
+          //传值
+          challenge.push(Number(numInput.value));
+
+          //跳转
           setTimeout(() => {
             document.body.removeChild(father);
             const gameContainer = document.querySelector(`.container`);
@@ -136,20 +141,31 @@ window.onload = () => {
     setTimeout(() => {
       pointDom.classList.remove(`rubberBand`);
     }, 600);
-    // if (point == challengeNumber) {
-    //   setInterval(() => {
-    //     let winRandom = Math.ceil(Math.random() * 120) - 1;
-    //     winAnimation(
-    //       tbody[winRandom],
-    //       tbody[winRandom + 16],
-    //       tbody[winRandom - 16]
-    //     );
-    //     point--;
-    //   }, 400);
-    //   if(point <=0){
-    //     clearInterval();
-    //   }
-    // }
+    if (challenge[0] != undefined) {
+      if (point == challenge[0]) {
+        setInterval(() => {
+          let winRandom = Math.ceil(Math.random() * 120) - 1;
+          let winDirection = Math.ceil(Math.random() * 3);
+          if (winDirection == 1) {
+            winAnimation(
+              tbody[winRandom],
+              tbody[winRandom + 16],
+              tbody[winRandom - 16]
+            );
+          } else if (winDirection == 2) {
+            winAnimation(
+              tbody[winRandom],
+              tbody[winRandom + 1],
+              tbody[winRandom - 1]
+            );
+          } else if (winDirection == 3) {
+            winAnimation(tbody[winRandom]);
+          }
+          point--;
+          pointDom.innerHTML = `Points:${Number(point)}`;
+        }, 400);
+      }
+    }
   };
 
   //所有的点击次数
@@ -203,8 +219,7 @@ window.onload = () => {
           clickBoatNum = -1;
         }
       }
-      
-      
+
       /**
        * 打中的次数和小船的长度进行比较
        * 全部打中 Point+1
